@@ -7,8 +7,6 @@ import org.graalvm.polyglot.*
 import java.io.File
 import java.util.*
 
-
-
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class ScriptablePluginEngine(val bootstrapPlugin: ScriptablePluginMain?, val bungeePlugin: ScriptableBungeePluginMain?, val rootServerFolder: String): Listener {
     var debugEnabled: Boolean = false

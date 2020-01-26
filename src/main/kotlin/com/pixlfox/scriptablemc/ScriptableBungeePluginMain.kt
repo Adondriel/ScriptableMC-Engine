@@ -6,6 +6,7 @@ import net.md_5.bungee.api.plugin.Plugin
 @Suppress("unused")
 class ScriptableBungeePluginMain : Plugin() {
     private var scriptEngine: ScriptablePluginEngine? = null
+    internal val mainThread: Thread = Thread.currentThread()
 
     override fun onLoad() {
 

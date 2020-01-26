@@ -2,7 +2,6 @@ package com.pixlfox.scriptablemc.core
 
 import com.pixlfox.scriptablemc.ScriptableBungeePluginMain
 import net.md_5.bungee.api.ProxyServer
-import net.md_5.bungee.api.plugin.Event
 import org.graalvm.polyglot.Value
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -13,7 +12,7 @@ class ScriptableBungeePluginContext(private val engine: ScriptablePluginEngine, 
     val bungeePlugin: ScriptableBungeePluginMain
         get() = engine.bungeePlugin!!
 
-    private var eventHandler: Value? = null
+//    private var eventHandler: Value? = null
 //    private var eventRouter: BungeeEventRouter = BungeeEventRouter(this)
 
     override fun load() {
@@ -55,13 +54,13 @@ class ScriptableBungeePluginContext(private val engine: ScriptablePluginEngine, 
 //        proxy.pluginManager.unregisterListener(eventRouter)
 //    }
 
-    internal fun fireEvent(eventMethod: String, event: Event) {
-        if(eventHandler != null) {
-            if (eventHandler!!.hasMember(eventMethod) && eventHandler!!.canInvokeMember(eventMethod)) {
-                eventHandler!!.invokeMember(eventMethod, event)
-            }
-        }
-    }
+//    internal fun fireEvent(eventMethod: String, event: Event) {
+//        if(eventHandler != null) {
+//            if (eventHandler!!.hasMember(eventMethod) && eventHandler!!.canInvokeMember(eventMethod)) {
+//                eventHandler!!.invokeMember(eventMethod, event)
+//            }
+//        }
+//    }
 
     companion object {
         fun newInstance(pluginName: String, engine: ScriptablePluginEngine, pluginInstance: Value): ScriptableBungeePluginContext {
@@ -77,8 +76,8 @@ class ScriptableBungeePluginContext(private val engine: ScriptablePluginEngine, 
     }
 }
 
+//@Suppress("MemberVisibilityCanBePrivate", "unused")
 //class BungeeEventRouter(private val context: ScriptableBungeePluginContext) : Listener {
-//
 //    @EventHandler fun onChatEvent(event: ChatEvent) = context.fireEvent("onChatEvent", event)
 //    @EventHandler fun onLoginEvent(event: LoginEvent) = context.fireEvent("onLoginEvent", event)
 //    @EventHandler fun onPlayerDisconnectEvent(event: PlayerDisconnectEvent) = context.fireEvent("onPlayerDisconnectEvent", event)
@@ -96,5 +95,4 @@ class ScriptableBungeePluginContext(private val engine: ScriptablePluginEngine, 
 //    @EventHandler fun onSettingsChangedEvent(event: SettingsChangedEvent) = context.fireEvent("onSettingsChangedEvent", event)
 //    @EventHandler fun onTabCompleteEvent(event: TabCompleteEvent) = context.fireEvent("onTabCompleteEvent", event)
 //    @EventHandler fun onTabCompleteResponseEvent(event: TabCompleteResponseEvent) = context.fireEvent("onTabCompleteResponseEvent", event)
-//
 //}
