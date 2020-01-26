@@ -1,5 +1,6 @@
 package com.pixlfox.scriptablemc
 
+import com.pixlfox.scriptablemc.core.ScriptableBungeePluginContext
 import com.pixlfox.scriptablemc.core.ScriptablePluginContext
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
@@ -18,7 +19,7 @@ import java.lang.reflect.Parameter
 class TypescriptLibraryExporter {
     private var exportPath: String = "./lib/ts"
     private val classList = mutableListOf<Class<*>>()
-    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
+    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|net\\.md_5|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
 
     fun allowPackages(regex: String): TypescriptLibraryExporter {
@@ -39,6 +40,7 @@ class TypescriptLibraryExporter {
     fun addHelperClasses(): TypescriptLibraryExporter {
         addClasses(
             ScriptablePluginContext::class.java,
+            ScriptableBungeePluginContext::class.java,
             ScriptablePluginEngine::class.java,
             fr.minuskube.inv.SmartInventory::class.java,
             com.pixlfox.scriptablemc.File::class.java,
@@ -48,6 +50,69 @@ class TypescriptLibraryExporter {
             com.google.common.io.ByteStreams::class.java
         )
         return this
+    }
+
+    fun addBungeeClasses(): TypescriptLibraryExporter {
+        return this.addClasses(
+            net.md_5.bungee.api.AbstractReconnectHandler::class.java,
+            net.md_5.bungee.api.Callback::class.java,
+            net.md_5.bungee.api.CommandSender::class.java,
+            net.md_5.bungee.api.Favicon::class.java,
+            net.md_5.bungee.api.ProxyServer::class.java,
+            net.md_5.bungee.api.ReconnectHandler::class.java,
+            net.md_5.bungee.api.ServerConnectRequest::class.java,
+            net.md_5.bungee.api.ServerPing::class.java,
+            net.md_5.bungee.api.SkinConfiguration::class.java,
+            net.md_5.bungee.api.Title::class.java,
+
+            net.md_5.bungee.api.scheduler.ScheduledTask::class.java,
+            net.md_5.bungee.api.scheduler.TaskScheduler::class.java,
+
+            net.md_5.bungee.api.score.Objective::class.java,
+            net.md_5.bungee.api.score.Position::class.java,
+            net.md_5.bungee.api.score.Score::class.java,
+            net.md_5.bungee.api.score.Scoreboard::class.java,
+            net.md_5.bungee.api.score.Team::class.java,
+
+            net.md_5.bungee.api.plugin.Cancellable::class.java,
+            net.md_5.bungee.api.plugin.Command::class.java,
+            net.md_5.bungee.api.plugin.Event::class.java,
+            net.md_5.bungee.api.plugin.Listener::class.java,
+            net.md_5.bungee.api.plugin.Plugin::class.java,
+            net.md_5.bungee.api.plugin.PluginClassloader::class.java,
+            net.md_5.bungee.api.plugin.PluginDescription::class.java,
+            net.md_5.bungee.api.plugin.PluginLogger::class.java,
+            net.md_5.bungee.api.plugin.PluginManager::class.java,
+            net.md_5.bungee.api.plugin.TabExecutor::class.java,
+
+            net.md_5.bungee.api.connection.ConnectedPlayer::class.java,
+            net.md_5.bungee.api.connection.Connection::class.java,
+            net.md_5.bungee.api.connection.PendingConnection::class.java,
+            net.md_5.bungee.api.connection.ProxiedPlayer::class.java,
+            net.md_5.bungee.api.connection.Server::class.java,
+
+            net.md_5.bungee.api.event.AsyncEvent::class.java,
+            net.md_5.bungee.api.event.ChatEvent::class.java,
+            net.md_5.bungee.api.event.LoginEvent::class.java,
+            net.md_5.bungee.api.event.PermissionCheckEvent::class.java,
+            net.md_5.bungee.api.event.PlayerDisconnectEvent::class.java,
+            net.md_5.bungee.api.event.PlayerHandshakeEvent::class.java,
+            net.md_5.bungee.api.event.PluginMessageEvent::class.java,
+            net.md_5.bungee.api.event.PostLoginEvent::class.java,
+            net.md_5.bungee.api.event.PreLoginEvent::class.java,
+            net.md_5.bungee.api.event.ProxyPingEvent::class.java,
+            net.md_5.bungee.api.event.ProxyReloadEvent::class.java,
+            net.md_5.bungee.api.event.ServerConnectedEvent::class.java,
+            net.md_5.bungee.api.event.ServerConnectEvent::class.java,
+            net.md_5.bungee.api.event.ServerDisconnectEvent::class.java,
+            net.md_5.bungee.api.event.ServerKickEvent::class.java,
+            net.md_5.bungee.api.event.ServerSwitchEvent::class.java,
+            net.md_5.bungee.api.event.SettingsChangedEvent::class.java,
+            net.md_5.bungee.api.event.TabCompleteEvent::class.java,
+            net.md_5.bungee.api.event.TabCompleteResponseEvent::class.java,
+            net.md_5.bungee.api.event.TargetedEvent::class.java
+
+        )
     }
 
     fun addBukkitClasses(): TypescriptLibraryExporter {
@@ -748,6 +813,7 @@ class TypescriptLibraryExporter {
         else if (className.equals("void", true)) "void"
         else if (className.equals("boolean", true)) "boolean"
         else if (className.equals("Value", true)) "any"
+        else if (className.equals("Predicate", true)) "any"
         else if (!packageName.matches(allowedPackagesRegex)) "any"
         else className
     }
@@ -781,8 +847,8 @@ class TypescriptLibraryExporter {
         fun main(args: Array<String>) {
             TypescriptLibraryExporter()
                 .exportPath("./lib/ts")
-                .allowPackages("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
                 .addHelperClasses()
+                .addBungeeClasses()
                 .addBukkitClasses()
                 .clean()
                 .exportLibraries()

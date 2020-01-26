@@ -1,16 +1,16 @@
 package com.pixlfox.scriptablemc.core
 
-import fr.minuskube.inv.InventoryManager
+import com.pixlfox.scriptablemc.ScriptableBungeePluginMain
+import com.pixlfox.scriptablemc.ScriptablePluginMain
 import org.bukkit.event.Listener
 import org.graalvm.polyglot.*
 import java.io.File
-import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
 
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFolder: String = "./"): Listener {
+class ScriptablePluginEngine(val bootstrapPlugin: ScriptablePluginMain?, val bungeePlugin: ScriptableBungeePluginMain?, val rootServerFolder: String): Listener {
     var debugEnabled: Boolean = false
 
     private val graalContext: Context = Context
@@ -23,12 +23,13 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFold
         .option("js.ecmascript-version", "2020")
         .build()
     private val jsBindings: Value = graalContext.getBindings("js")
-    internal val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
-    internal val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
+    internal val scriptablePlugins: MutableList<IScriptablePluginContext> = mutableListOf()
+
+    constructor(bootstrapPlugin: ScriptablePluginMain) : this(bootstrapPlugin, null, "./")
+    constructor(bungeePlugin: ScriptableBungeePluginMain) : this(null, bungeePlugin, "./")
 
     internal fun start() {
         instance = this
-        inventoryManager.init()
         jsBindings.putMember("engine", this)
 
         val mainScriptFile = File("${rootServerFolder}scripts/main.js")
@@ -58,6 +59,14 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFold
         scriptablePlugins.clear()
 
         graalContext.close(true)
+    }
+
+    fun isBungeeServer(): Boolean {
+        return bungeePlugin != null
+    }
+
+    fun isMinecraftServer(): Boolean {
+        return bootstrapPlugin != null
     }
 
     fun evalFile(filePath: String): Value {
@@ -90,14 +99,27 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFold
         return graalContext.eval(source)
     }
 
-    fun loadPlugin(scriptableClass: Value): ScriptablePluginContext {
+    fun loadPlugin(scriptableClass: Value) {
         val pluginInstance = scriptableClass.newInstance()
         val pluginName = pluginInstance.getMember("pluginName").asString()
-        val pluginContext = ScriptablePluginContext.newInstance(pluginName, this, pluginInstance)
-        pluginInstance.putMember("context", pluginContext)
-        scriptablePlugins.add(pluginContext)
-        pluginContext.load()
-        return pluginContext
+
+        when {
+            isMinecraftServer() -> {
+                val pluginContext = ScriptablePluginContext.newInstance(pluginName, this, pluginInstance)
+                pluginInstance.putMember("context", pluginContext)
+                scriptablePlugins.add(pluginContext)
+                pluginContext.load()
+            }
+            isBungeeServer() -> {
+                val pluginContext = ScriptableBungeePluginContext.newInstance(pluginName, this, pluginInstance)
+                pluginInstance.putMember("context", pluginContext)
+                scriptablePlugins.add(pluginContext)
+                pluginContext.load()
+            }
+            else -> {
+                throw java.lang.Exception("Unable to create plugin context.")
+            }
+        }
     }
 
     fun enableAllPlugins() {

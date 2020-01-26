@@ -15,7 +15,7 @@ import java.util.function.Consumer
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class SmartInventoryInterface {
     fun builder(): SmartInventory.Builder {
-        return SmartInventory.builder().manager(ScriptablePluginEngine.instance!!.inventoryManager)
+        return SmartInventory.builder().manager(ScriptablePluginEngine.instance?.bootstrapPlugin?.inventoryManager)
     }
 
     fun provider(scriptableObject: Value): SmartInventoryProvider {

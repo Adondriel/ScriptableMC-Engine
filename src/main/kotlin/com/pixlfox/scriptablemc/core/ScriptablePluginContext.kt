@@ -3,70 +3,61 @@ package com.pixlfox.scriptablemc.core
 import com.pixlfox.scriptablemc.File
 import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
 import com.pixlfox.scriptablemc.smartinvs.SmartItemBuilder
-//import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
-//import com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider
-//import com.pixlfox.scriptablemc.smartinvs.SmartItemBuilder
-//import fr.minuskube.inv.SmartInventory
 import io.github.jorelali.commandapi.api.CommandAPI
 import io.github.jorelali.commandapi.api.arguments.Argument
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.Server
-import org.bukkit.command.Command
 import org.bukkit.command.CommandMap
-import org.bukkit.command.CommandSender
+import org.bukkit.command.PluginCommand
+import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
-import java.util.HashMap
-import java.lang.reflect.InvocationTargetException
-import org.bukkit.command.PluginCommand
-import org.bukkit.configuration.file.FileConfiguration
-import org.bukkit.entity.Player
-import org.bukkit.generator.ChunkGenerator
 import org.bukkit.inventory.ItemStack
-import org.bukkit.plugin.*
+import org.bukkit.plugin.EventExecutor
+import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.plugin.messaging.PluginMessageListener
 import org.bukkit.plugin.messaging.PluginMessageListenerRegistration
 import org.graalvm.polyglot.Value
-import java.io.InputStream
-import java.util.logging.Logger
+import java.lang.reflect.InvocationTargetException
+import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pluginName: String, val pluginInstance: Value): Listener {
+class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pluginName: String, val pluginInstance: Value): Listener, IScriptablePluginContext {
     val server: Server
         get() = Bukkit.getServer()
 
     val javaPlugin: JavaPlugin
-        get() = engine.bootstrapPlugin
+        get() = engine.bootstrapPlugin!!
 
     val commandApi: CommandAPI
         get() = CommandAPI.getInstance()
 
     private val commands = mutableListOf<PluginCommand>()
 
-    internal fun load() {
+    override fun load() {
         if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Loading scriptable plugin context.")
+            javaPlugin.logger.info("[$pluginName] Loading scriptable plugin context.")
         }
 
         pluginInstance.invokeMember("onLoad")
     }
 
-    internal fun enable() {
+    override fun enable() {
         if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Enabling scriptable plugin context.")
+            javaPlugin.logger.info("[$pluginName] Enabling scriptable plugin context.")
         }
 
         pluginInstance.invokeMember("onEnable")
     }
 
-    internal fun disable() {
+    override fun disable() {
         if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Disabling scriptable plugin context.")
+            javaPlugin.logger.info("[$pluginName] Disabling scriptable plugin context.")
         }
 
         pluginInstance.invokeMember("onDisable")
@@ -184,7 +175,7 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
             return PlaceholderAPI.setPlaceholders(player, placeholderText)
         }
 
-        engine.bootstrapPlugin.logger.warning("[$pluginName] Placeholder API is missing.")
+        javaPlugin.logger.warning("[$pluginName] Placeholder API is missing.")
         return placeholderText
     }
 
@@ -193,14 +184,14 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
             return PlaceholderAPI.setPlaceholders(player, placeholderText)
         }
 
-        engine.bootstrapPlugin.logger.warning("[$pluginName] Placeholder API is missing.")
+        javaPlugin.logger.warning("[$pluginName] Placeholder API is missing.")
         return placeholderText
     }
 
     companion object {
         fun newInstance(pluginName: String, engine: ScriptablePluginEngine, pluginInstance: Value): ScriptablePluginContext {
             if(engine.debugEnabled) {
-                engine.bootstrapPlugin.logger.info("[$pluginName] Creating new scriptable plugin context.")
+                engine.bootstrapPlugin!!.logger.info("[$pluginName] Creating new scriptable plugin context.")
             }
 
             val context =  ScriptablePluginContext(engine, pluginName, pluginInstance)

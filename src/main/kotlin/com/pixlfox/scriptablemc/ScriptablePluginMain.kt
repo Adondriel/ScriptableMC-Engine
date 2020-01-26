@@ -2,6 +2,7 @@ package com.pixlfox.scriptablemc
 
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.pixlfox.scriptablemc.smartinvs.MainMenu
+import fr.minuskube.inv.InventoryManager
 import io.github.jorelali.commandapi.api.CommandAPI
 import io.github.jorelali.commandapi.api.CommandExecutor
 import io.github.jorelali.commandapi.api.CommandPermission
@@ -18,6 +19,7 @@ import org.graalvm.polyglot.PolyglotException
 @Suppress("unused")
 class ScriptablePluginMain : JavaPlugin(), Listener {
     private var scriptEngine: ScriptablePluginEngine? = null
+    internal val inventoryManager: InventoryManager = InventoryManager(this)
 
     override fun onLoad() {
         runInPluginContext {
@@ -155,6 +157,7 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
     }
 
     override fun onEnable() {
+        inventoryManager.init()
         runInPluginContext {
             try {
                 scriptEngine = ScriptablePluginEngine(this)

@@ -7,6 +7,7 @@ import org.bukkit.entity.Player
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import fr.minuskube.inv.ClickableItem
+import fr.minuskube.inv.InventoryManager
 import fr.minuskube.inv.SmartInventory
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -57,7 +58,7 @@ class MainMenu(private val pluginEngine: ScriptablePluginEngine) : InventoryProv
         val INVENTORY: SmartInventory
             get() = SmartInventory.builder()
                     .id("spm.mainmenu")
-                    .manager(ScriptablePluginEngine.instance!!.inventoryManager)
+                    .manager(ScriptablePluginEngine.instance?.bootstrapPlugin?.inventoryManager)
                     .provider(MainMenu(ScriptablePluginEngine.instance!!))
                     .size(3, 9)
                     .title(ChatColor.LIGHT_PURPLE.toString() + "ScriptableMC | Main Menu")
