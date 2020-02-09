@@ -3,6 +3,8 @@ package com.pixlfox.scriptablemc
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
+import com.pixlfox.scriptablemc.core.js.JavaScriptPluginContext
+import com.pixlfox.scriptablemc.core.js.JavaScriptPluginEngine
 import com.thoughtworks.paranamer.BytecodeReadingParanamer
 import com.thoughtworks.paranamer.Paranamer
 import java.io.File
@@ -84,8 +86,8 @@ class TypescriptLibraryExporter {
 
     fun addHelperClasses(): TypescriptLibraryExporter {
         addClasses(
-            com.pixlfox.scriptablemc.core.ScriptablePluginContext::class.java,
-            com.pixlfox.scriptablemc.core.ScriptablePluginEngine::class.java,
+            JavaScriptPluginContext::class.java,
+            JavaScriptPluginEngine::class.java,
             fr.minuskube.inv.SmartInventory::class.java,
             com.pixlfox.scriptablemc.utils.FileWrapper::class.java,
             com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider::class.java,

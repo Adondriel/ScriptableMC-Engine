@@ -2,13 +2,16 @@ package com.pixlfox.scriptablemc
 
 import co.aikar.commands.PaperCommandManager
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
+import com.pixlfox.scriptablemc.core.js.JavaScriptPluginEngine
+import com.pixlfox.scriptablemc.core.python.PythonPluginEngine
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 
 
-@Suppress("unused")
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 class ScriptablePluginMain : JavaPlugin(), Listener {
-    internal var scriptEngine: ScriptablePluginEngine? = null
+    internal var jsPluginEngine: ScriptablePluginEngine? = null
+    internal var pythonPluginEngine: ScriptablePluginEngine? = null
     private var commandManager: PaperCommandManager? = null
 
     override fun onLoad() {
@@ -19,26 +22,54 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
         commandManager = PaperCommandManager(this)
         commandManager?.registerCommand(ScriptablePluginCommand(this))
         commandManager?.registerCommand(ScriptablePluginJavaScriptCommand(this))
-        commandManager?.registerCommand(ScriptablePluginTypeScriptCommand(this))
+        commandManager?.registerCommand(ScriptablePluginPythonCommand(this))
 
         patchClassLoader {
             saveDefaultConfig()
 
             try {
-                scriptEngine = ScriptablePluginEngine(this, config.getString("root_scripts_folder", "./scripts").orEmpty(), config.getBoolean("debug", false), config.getBoolean("extract_libs", true))
-                scriptEngine!!.start()
-                logger.info("Scriptable plugin engine started.")
+                jsPluginEngine = JavaScriptPluginEngine(
+                    this,
+                    config.getString("root_scripts_folder", "./scripts").orEmpty(),
+                    config.getBoolean("debug", false),
+                    config.getBoolean("extract_libs", true)
+                )
+                jsPluginEngine!!.start()
+                logger.info("JavaScript plugin engine started.")
             } catch (e: IllegalStateException) {
                 if (e.message?.contains("Make sure the truffle-api.jar is on the classpath.", true) == true) {
-                    logger.warning("Scriptable plugin engine failed to start.")
+                    logger.warning("JavaScript plugin engine failed to start.")
                     e.printStackTrace()
-                    logger.severe("It looks like you're trying to run this server with the standard java runtime. ScriptableMC only works with the GraalVM java runtime.")
+                    logger.severe("It looks like you're trying to run this server with the standard JRE. ScriptableMC only works with the GraalVM java runtime or JDK.")
                 } else {
-                    logger.warning("Scriptable plugin engine failed to start.")
+                    logger.warning("JavaScript plugin engine failed to start.")
                     e.printStackTrace()
                 }
             } catch (e: Exception) {
-                logger.warning("Scriptable plugin engine failed to start.")
+                logger.warning("JavaScript plugin engine failed to start.")
+                e.printStackTrace()
+            }
+
+            try {
+                pythonPluginEngine = PythonPluginEngine(
+                    this,
+                    config.getString("root_scripts_folder", "./scripts").orEmpty(),
+                    config.getBoolean("debug", false),
+                    config.getBoolean("extract_libs", true)
+                )
+                pythonPluginEngine!!.start()
+                logger.info("Python plugin engine started.")
+            } catch (e: IllegalStateException) {
+                if (e.message?.contains("Make sure the truffle-api.jar is on the classpath.", true) == true) {
+                    logger.warning("Python plugin engine failed to start.")
+                    e.printStackTrace()
+                    logger.severe("It looks like you're trying to run this server with the standard JRE. ScriptableMC only works with the GraalVM java runtime or JDK.")
+                } else {
+                    logger.warning("Python plugin engine failed to start.")
+                    e.printStackTrace()
+                }
+            } catch (e: Exception) {
+                logger.warning("Python plugin engine failed to start.")
                 e.printStackTrace()
             }
         }
@@ -47,10 +78,24 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
     override fun onDisable() {
         patchClassLoader {
             try {
-                scriptEngine!!.close()
-                logger.info("Scriptable plugin engine shutdown.")
+                if(jsPluginEngine != null) {
+                    jsPluginEngine!!.close()
+                    jsPluginEngine = null
+                    logger.info("JavaScript plugin engine shutdown.")
+                }
             } catch (e: Exception) {
-                logger.warning("Scriptable plugin engine failed to shutdown.")
+                logger.warning("JavaScript plugin engine failed to shutdown.")
+                e.printStackTrace()
+            }
+
+            try {
+                if(pythonPluginEngine != null) {
+                    pythonPluginEngine!!.close()
+                    pythonPluginEngine = null
+                    logger.info("Python plugin engine shutdown.")
+                }
+            } catch (e: Exception) {
+                logger.warning("Python plugin engine failed to shutdown.")
                 e.printStackTrace()
             }
         }
@@ -71,7 +116,7 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
     companion object {
         private var inst: ScriptablePluginMain? = null
         var instance: ScriptablePluginMain
-            internal set(value) { inst = value }
+            private set(value) { inst = value }
             get() { return inst!! }
     }
 }

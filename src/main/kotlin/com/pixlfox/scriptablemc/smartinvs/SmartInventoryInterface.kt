@@ -1,6 +1,6 @@
 package com.pixlfox.scriptablemc.smartinvs
 
-import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
+import com.pixlfox.scriptablemc.core.js.JavaScriptPluginEngine
 import fr.minuskube.inv.ClickableItem
 import fr.minuskube.inv.SmartInventory
 import fr.minuskube.inv.content.InventoryContents
@@ -15,7 +15,7 @@ import java.util.function.Consumer
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class SmartInventoryInterface {
     fun builder(): SmartInventory.Builder {
-        return SmartInventory.builder().manager(ScriptablePluginEngine.instance!!.inventoryManager)
+        return SmartInventory.builder().manager(JavaScriptPluginEngine.instance!!.inventoryManager)
     }
 
     fun provider(scriptableObject: Value): SmartInventoryProvider {

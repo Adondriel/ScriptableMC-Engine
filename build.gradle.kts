@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.pixlfox.scriptablemc"
-version = "1.1.7"
+version = "1.2.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -55,11 +55,18 @@ repositories {
 }
 
 dependencies {
-    // GraalVM SDK & GraalJS Engine
+    // GraalVM SDK & Truffle API
     implementation("org.graalvm.sdk:graal-sdk:19.3.1")
+    implementation("org.graalvm.truffle:truffle-api:19.3.1")
+
+    // GraalVM JavaScript Engine
     implementation("org.graalvm.js:js:19.3.1")
     implementation("org.graalvm.js:js-scriptengine:19.3.1")
-    implementation("org.graalvm.truffle:truffle-api:19.3.1")
+
+    // GraalVM Python Engine
+    implementation(files("libraries/graalpython.jar"))
+    implementation(files("libraries/sulong-api.jar"))
+    implementation(files("libraries/sulong.jar"))
 
     implementation("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")

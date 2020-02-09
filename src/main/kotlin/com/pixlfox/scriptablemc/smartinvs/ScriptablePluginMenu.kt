@@ -1,6 +1,6 @@
 package com.pixlfox.scriptablemc.smartinvs
 
-import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
+import com.pixlfox.scriptablemc.core.js.JavaScriptPluginEngine
 import fr.minuskube.inv.content.InventoryContents
 import fr.minuskube.inv.content.InventoryProvider
 import org.bukkit.entity.Player
@@ -10,23 +10,21 @@ import fr.minuskube.inv.ClickableItem
 import fr.minuskube.inv.SmartInventory
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import fr.minuskube.inv.content.SlotIterator
-
 
 
 @Suppress("unused")
-class MainMenu(private val pluginEngine: ScriptablePluginEngine) : InventoryProvider {
+class MainMenu(private val pluginEngine: JavaScriptPluginEngine) : InventoryProvider {
     override fun init(player: Player?, contents: InventoryContents?) {
         if(contents != null && player != null) {
             contents.fillBorders(ClickableItem.empty(ItemStack(Material.BLACK_CONCRETE)))
 
-            if(player.hasPermission("scriptablemc.js.reload")) {
+            if(player.hasPermission("scriptablemc.reload")) {
                 val reloadItemStack = ItemStack(Material.GOLD_NUGGET)
                 val reloadItemMeta = reloadItemStack.itemMeta
                 reloadItemMeta?.setDisplayName("${ChatColor.DARK_AQUA}Reload Script Engine")
                 reloadItemStack.itemMeta = reloadItemMeta
                 contents.set(1, 1, ClickableItem.of(reloadItemStack) {
-                    Bukkit.getServer().dispatchCommand(player, "jsreload")
+                    Bukkit.getServer().dispatchCommand(player, "scriptablemc reload")
                 })
             }
 
@@ -57,8 +55,8 @@ class MainMenu(private val pluginEngine: ScriptablePluginEngine) : InventoryProv
         val INVENTORY: SmartInventory
             get() = SmartInventory.builder()
                     .id("spm.mainmenu")
-                    .manager(ScriptablePluginEngine.instance!!.inventoryManager)
-                    .provider(MainMenu(ScriptablePluginEngine.instance!!))
+                    .manager(JavaScriptPluginEngine.instance!!.inventoryManager)
+                    .provider(MainMenu(JavaScriptPluginEngine.instance!!))
                     .size(3, 9)
                     .title(ChatColor.LIGHT_PURPLE.toString() + "ScriptableMC | Main Menu")
                     .closeable(true)

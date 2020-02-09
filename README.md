@@ -22,11 +22,11 @@ You can take the typescript example and compile it, then directly modify the jav
 ## Commands and Permissions
 | Command       | Alias         | Description                                           | Permission               |
 | ------------- | ------------- |-----------------------------------------------------| ------------------------ |
-| `/scriptablemc javascript reload`   | `/smc js rl`       | Fully reloads the script engine and all script files. | `scriptablemc.js.reload` |
-| `/scriptablemc javascript execute <source>`   | `/smc js ex <source>`       | Executes javascript source and prints the return value. | `scriptablemc.js.execute` |
-| `/scriptablemc javascript file <filePath>`   | `/smc js f <filePath>`       | Executes javascript file from the scripts folder. | `scriptablemc.js.execute.file` |
+| `/scriptablemc reload`   | `/smc rl`       | Fully reloads the script engine and all script files. | `scriptablemc.reload` |
 | `/scriptablemc menu`   | `/smc menu`       | Opens an inventory menu that allows you to control the scriptable engine. | `scriptablemc.menu` |
 | `/scriptablemc info`   | `/smc info`       | Prints plugin version and GraalVM/GraalJS versions if available. | `scriptablemc.info` |
+| `/scriptablemc javascript execute <source>`   | `/smc js ex <source>`       | Executes javascript source and prints the return value. | `scriptablemc.js.execute` |
+| `/scriptablemc javascript file <filePath>`   | `/smc js f <filePath>`       | Executes javascript file from the scripts folder. | `scriptablemc.js.execute.file` |
 
 ### `/smc javascript execute` Command Example
 > `/jsex return 1 + 1` <br>
